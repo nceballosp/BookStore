@@ -2,6 +2,9 @@ from flask import Flask, render_template
 from extensions import db, login_manager
 from models.user import User
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DB_HOST = os.environ.get('DB_HOST', '172.31.20.36') 
 DB_USER = os.environ.get('DB_USER', 'postgres')
