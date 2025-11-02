@@ -1,10 +1,19 @@
 from flask import Flask, render_template
 from extensions import db, login_manager
 from models.user import User
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_HOST = os.environ.get('DB_HOST', '172.31.20.36') 
+DB_USER = os.environ.get('DB_USER', 'postgres')
+DB_PASS = os.environ.get('DB_PASS', '')
+DB_NAME = os.environ.get('DB_NAME', 'bookstore')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bookstore.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
 
 db.init_app(app)
 login_manager.init_app(app)
