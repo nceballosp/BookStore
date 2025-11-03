@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookstore
+  labels:
+    app: bookstore
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: bookstore
+    tier: frontend
+  type: LoadBalancer
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: bookstore-efs-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-0d2b5ff834bfe5f61
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bookstore-efs-pvc
+  labels:
+    app: bookstore
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: bookstore
+  labels:
+    app: bookstore
+spec:
+  selector:
+    matchLabels:
+      app: bookstore
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: bookstore
+        tier: frontend
+    spec:
+      containers:
+      - image: edup3/bookstore:latest
+        name: bookstore
+        env:
+        - name: DB_HOST
+          value: bookstore-mysql
+        - name: DB_USER
+          value: bookstore
+        - name: DB_PASS
+          value: password
+        - name: DB_NAME
+          value: bookstore
+        - name: DB_PORT
+          value: "3306"
+        ports:
+        - containerPort: 80
+          name: bookstore
+        volumeMounts:
+        - name: bookstore-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: bookstore-persistent-storage
+        persistentVolumeClaim:
+          claimName: bookstore-efs-pvc

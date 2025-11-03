@@ -6,14 +6,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_HOST = os.environ.get('DB_HOST', '172.31.20.36') 
-DB_USER = os.environ.get('DB_USER', 'postgres')
+DB_HOST = os.environ.get('DB_HOST', '') 
+DB_USER = os.environ.get('DB_USER', 'root')
 DB_PASS = os.environ.get('DB_PASS', '')
 DB_NAME = os.environ.get('DB_NAME', 'bookstore')
-
+DB_PORT = os.environ.get('DB_PORT', '3306')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
+# Usar conector pymysql para MySQL
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
 
 db.init_app(app)
 login_manager.init_app(app)
