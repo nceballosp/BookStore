@@ -7,6 +7,7 @@ metadata:
 spec:
   ports:
     - port: 80
+      targetPort: 5000
   selector:
     app: bookstore
     tier: frontend
@@ -32,7 +33,7 @@ spec:
   storageClassName: efs-sc
   csi:
     driver: efs.csi.aws.com
-    volumeHandle: fs-0d2b5ff834bfe5f61
+    volumeHandle: fs-005ac93b204f75684
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -82,7 +83,7 @@ spec:
         - name: DB_PORT
           value: "3306"
         ports:
-        - containerPort: 80
+        - containerPort: 5000
           name: bookstore
         volumeMounts:
         - name: bookstore-persistent-storage
