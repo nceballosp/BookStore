@@ -18,13 +18,18 @@ Este proyecto tiene tres objetivos:
 
 ## 2. Desarrollo de los objetivos
 
-## **Objetivo 1**
-## 1. Prerrequisitos
+### Objetivo 1
+
+----------------------------------
+
+#### 1. Prerrequisitos
 - Un dominio web (GoDaddy, Hostinger, Namecheap)
 - 2 Maquinas EC2 en AWS (Ubuntu) [Tutorial](https://aws.amazon.com/es/getting-started/hands-on/deploy-wordpress-with-amazon-rds/3)
 - 2 Direcciones IP elásticas AWS
-## 2. Pasos
-### Creación de los grupos de seguridad
+#### 2. Pasos
+
+**Creación de los grupos de seguridad**
+
 Lo primero que haremos es crear los grupos de seguridad para nuestras 2 maquinas, uno para el servidor web y otro para la base de datos
 <img width="1300" alt="image" src="https://github.com/user-attachments/assets/7360951c-438d-4a48-a051-fc30b12db207" />
 
@@ -45,7 +50,8 @@ Luego editamos las reglas del primer grupo de seguridad para hacer lo mismo pero
 
 Asi nuestras 2 máquinas van a poder comunicarse sin problema.
 
-### Creación y configuración de las máquinas EC2
+**Creación y configuración de las máquinas EC2**
+
 El próximo paso es instanciar 2 máquinas ec2 y asignarle a cada una su grupo de seguridad y su dirección elástica.
 [Tutorial](https://aws.amazon.com/es/getting-started/hands-on/deploy-wordpress-with-amazon-rds/3)
 
@@ -180,19 +186,160 @@ contestamos las preguntas y luego ejecutamos el siguiente comando con nuestros d
 
 ------------------------------------
 
-## **Objetivo 2**
+### Objetivo 2
+
+------------------------------------
+
 Para el objetivo 2 usaremos modificaremos una copia de Bookstore-1, configurada para conectarse con otra base de datos del servicio RDS, esta imagen servira como plantilla para nuestro grupo de auto escalado.
 
 ## Pasos
 
 
 
-## **Objetivo 2**
+### Objetivo 3
 
+-----------------------------
+
+#### Pasos
+
+**Crecion cluster EKS y Node Group**
+
+Elegimos hacerlo con una configuracion personalizada, lo primero que vamos a cambiar va a ser apagar el modo automatico EKS.
+
+Le ponemos un nombre y escogemos el grupo IAM
+
+<img width="1230" alt="image" src="https://github.com/user-attachments/assets/2f09d611-7dfb-46fa-b4c6-af03e4e29bab" />
+
+------------------
+
+
+Despues ponemos la siguiente configuracion en la pestaña de Redes
+
+<img width="1230" alt="image" src="https://github.com/user-attachments/assets/49e5e198-7e61-4f97-8ff4-318a63e96dc1" />
+
+--------------------------------
+
+Una vez creado el EKS vamos configurar un Node Group
+
+<img width="1232" alt="image" src="https://github.com/user-attachments/assets/ad5687ea-0d51-476a-b5d2-4c6c75791d54" />
+
+------------------------------------
+
+Abrimos la CloudShell y ejecutamos los sigueintes comandos:
+
+```
+aws eks update-kubeconfig --region us-east-1 --name bookstoreEKS
+kubectl get nodes
+```
+
+Cambiar bookstoreEKS por el nombre de tu EKS y clonamos el repositorio
+
+<img width="723" alt="image" src="https://github.com/user-attachments/assets/d2678dc8-52a2-4b9a-954c-4af8a3e05de9" />
+
+
+```cd BookStore```
+
+-------------------------------------
+
+**Crear EFS**
+
+<img width="740" alt="image" src="https://github.com/user-attachments/assets/64fd975b-68a6-4ecc-b420-99de827c21cd" />
+
+Creamos un EFS con ID fs-093862ff5652dd241, que usaremos luego.
+
+Despues modificamos las reglas del grupo de seguridad default:
+
+<img width="1520" alt="image" src="https://github.com/user-attachments/assets/37052721-8060-48c3-9773-504f32ad7237" />
+
+-----------------------------
+
+Volvemos a la Cloud Shell y ejecutamos los siguientes comandos:
+
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+
+<img width="790" alt="image" src="https://github.com/user-attachments/assets/c924f2e1-000e-40f8-8844-ca432813bf91" />
+
+---------------------------------
+
+**Instalar EFS para EKS y ejecutar el manifiesto**
+
+```helm repo add aws-efs-csi-driver https://kubernetes-sigs.github.io/aws-efs-csi-driver/```
+
+```
+kubectl apply -f private-ecr-driver.yaml
+helm repo update
+helm install aws-efs-csi-driver aws-efs-csi-driver/aws-efs-csi-driver \
+--namespace kube-system \
+--set controller.serviceAccount.create=false \
+--set controller.serviceAccount.name=efs-csi-controller-sa
+```
+
+Para confirmar que instaló pods de EFS:
+
+```
+kubectl get pods -n kube-system | grep efs
+```
+
+<img width="774" alt="image" src="https://github.com/user-attachments/assets/64b63731-e70d-4a40-a8a7-a469f485ae8e" />
+
+-------------------------
+
+**Ejecución Manifiestos**
+```
+nano -w 02app-deployment.yaml
+```
+
+<img width="355" alt="image" src="https://github.com/user-attachments/assets/ae8865c0-554e-451e-90ee-ab2d2396967b" />
+
+---------------------
+
+Cambiar volumeHandle por el id de tu EFS
+
+```
+kubectl apply -f 01mysql-deployment.yaml
+kubectl apply -f 02app-deployment.yaml
+```
+
+<img width="327" alt="image" src="https://github.com/user-attachments/assets/f0826d88-1b0a-4684-a094-da2039200d12" />
+
+-------------------------------------
+
+Finalmente para monitorear:
+
+```
+kubectl get pods -–watch
+kubectl get all -o wide
+```
+
+<img width="1144" alt="image" src="https://github.com/user-attachments/assets/a2907a69-8e3a-4086-af46-ad01733f3d94" />
+
+------------------------------
+
+Nos conectamos en la web con la EXTERNAL-IP 
+
+http://ad2654523a8ac4c8382604bfed22f8c4-1034843709.us-east-1.elb.amazonaws.com
+
+<img width="1866"  alt="image" src="https://github.com/user-attachments/assets/797e11f6-5115-4ac0-892f-6747501fa7a4" />
+
+----------------------------
+
+**Objetivo Cumplido**
+
+-----------------------------
+
+### Objetivo 4
+
+-----------------------------
 
 ## 2. información general de diseño de alto nivel, arquitectura, patrones, mejores prácticas utilizadas.
 
 ## 3. Descripción del ambiente de desarrollo y técnico: lenguaje de programación, librerías, paquetes, etc, con sus números de versiones.
+
+
 
 <!-- como se compila y ejecuta.
 detalles del desarrollo.
