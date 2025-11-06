@@ -194,6 +194,52 @@ Para el objetivo 2 usaremos modificaremos una copia de Bookstore-1, configurada 
 
 ## Pasos
 
+### Crear y configurar los grupos de seguridad y la base de datos RDS
+
+Para crear los grupos de seguridad repetiremos los pasos de los grupos de seguridad del objetivo 1
+
+<!-- Agregar fotos de los grupos de seguridad -->
+
+Luego procederemos a crear la base de datos en el servicio RDS de AWS
+Elegimos una base de datos MySQL y configuramos un usuario y contraseña que queramos, nosotros usaremos admin y bookstore_password
+
+![alt text](image-11.png)
+
+![alt text](image-12.png)
+
+### Configurar el servidor web
+Para configurar el servidor web debemos editar los parametros de la conexion a la base de datos y automatizar la ejecucion del contenedor al encender la maquina, si no queremos usar la misma instancia podemos repetir los pasos del objetivo 1 o hacer una copia de la imagen Bookstore-1.
+
+Primero modificamos el archivo .env para cambiar la base de datos
+volvemos a crear la imagen y a instanciar un contenedor con la nueva imagen
+
+![alt text](image-14.png)
+
+```sudo docker image build . -t bookstore```
+
+```sudo docker container run --restart unless-stopped -p 5000:5000 -d --name bookstore_c bookstore```
+
+Luego de esto debemos crear una imagen de esta instancia modificada para ser usada por el autos scaling group
+
+![alt text](image-15.png)
+
+Despues creamo una launch template usando esta imagen y el grupo de seguridad para el objetivo 2 creado al inicio
+
+![alt text](image-16.png)
+
+Creamos el auto scaling group dentro del servicio EC2 de AWS con la template que acabamos de crear
+
+![alt text](image-17.png)
+
+En este paso creamos nuestro Load Balancer y su target group
+
+![alt text](image-18.png)
+
+![alt text](image-19.png)
+
+Luego de crear el autoscaling group y el load balancer debemos configurar nuestro dominio para que apunte a nuestro ELB
+
+
 
 
 ### Objetivo 3
