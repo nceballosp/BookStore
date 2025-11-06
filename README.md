@@ -381,6 +381,51 @@ http://ad2654523a8ac4c8382604bfed22f8c4-1034843709.us-east-1.elb.amazonaws.com
 
 -----------------------------
 
+Usando el EKS del objetivo pasado o uno nuevo con la misma configuaracion clonamos el repositorio de la aplicacion deseada.
+
+Nosotros usaremos el siguiente: https://github.com/microservices-demo/microservices-demo.git
+
+```git clone https://github.com/microservices-demo/microservices-demo.git```
+
+Vamos hasta el directorio donde esta el manifiesto.
+
+Antes de ejecutarlo tuvimos que cambiar el tipo de servicio del front-end en el manifiesto para que nos diera una EXTERNAL_IP, antes el servicio era de tipo NodePort y lo cambbiamos a LoadBalancer
+
+```nano complete-demo.yaml```
+
+<img width="523" alt="image" src="https://github.com/user-attachments/assets/9ce96da8-db1f-41f4-a988-3716d5fccaa0" />
+
+--------------------------------
+
+Guardamos los cambios y ejecutamos:
+
+```kubectl apply -f complete-demo.yaml```
+
+<img width="475" alt="image" src="https://github.com/user-attachments/assets/4c21066d-16c4-45e5-be3f-b036827988ad" />
+
+----------------------------------
+
+Despues:
+
+```
+kubectl get pods --watch -n sock-shop
+kubectl get all -o wide -n sock-shop
+```
+
+<img width="1410" alt="image" src="https://github.com/user-attachments/assets/f5d0ff1a-5824-4279-8729-00996190b733" />
+
+--------------------------------
+
+Finalmente accedemos a la pagina en: http://a7a1b8effeb154c5b974807de8686916-221227143.us-east-1.elb.amazonaws.com
+
+<img width="1857" alt="image" src="https://github.com/user-attachments/assets/e68c2ffd-fe87-4771-aed0-ba4745687a8e" />
+
+--------------------------------
+
+**Objetivo Cumplido**
+
+---------------------------------
+
 ## 2. información general de diseño de alto nivel, arquitectura, patrones, mejores prácticas utilizadas.
 
 ## 3. Descripción del ambiente de desarrollo y técnico: lenguaje de programación, librerías, paquetes, etc, con sus números de versiones.
