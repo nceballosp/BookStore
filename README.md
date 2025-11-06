@@ -426,33 +426,6 @@ Finalmente accedemos a la pagina en: http://a7a1b8effeb154c5b974807de8686916-221
 
 ---------------------------------
 
-## 2. información general de diseño de alto nivel, arquitectura, patrones, mejores prácticas utilizadas.
 
-## 3. Descripción del ambiente de desarrollo y técnico: lenguaje de programación, librerías, paquetes, etc, con sus números de versiones.
-
-
-
-<!-- como se compila y ejecuta.
-detalles del desarrollo.
-detalles técnicos
-descripción y como se configura los parámetros del proyecto (ej: ip, puertos, conexión a bases de datos, variables de ambiente, parámetros, etc)
-opcional - detalles de la organización del código por carpetas o descripción de algún archivo. (ESTRUCTURA DE DIRECTORIOS Y ARCHIVOS IMPORTANTE DEL PROYECTO, comando 'tree' de Linux)
-opcionalmente - si quiere mostrar resultados o pantallazos  -->
-
-<!-- 4. Descripción del ambiente de EJECUCIÓN (en producción) lenguaje de programación, librerías, paquetes, etc, con sus números de versiones.
-
- IP o nombres de dominio en nube o en la máquina servidor.
-
- descripción y como se configura los parámetros del proyecto (ej: ip, puertos, conexión a bases de datos, variables de ambiente, parámetros, etc)
-
-como se lanza el servidor.
-
-una mini guía de como un usuario utilizaría el software o la aplicación
-
-opcionalmente - si quiere mostrar resultados o pantallazos  -->
-
-# 5. otra información que considere relevante para esta actividad.
-
-# Referencias:
 
 
